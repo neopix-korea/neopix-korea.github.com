@@ -1,0 +1,7 @@
+backups/
+node_modules/
+*.idlk
+*.indd
+*.pdf
+.env
+.env.*
