@@ -1,3 +1,181 @@
-<html>
-<h1>네오픽스코리아 깃허브 페이지</h1>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네오픽스코리아 아케이드</title>
+    <style>
+        :root {
+            --bg-color: #0d0f18;
+            --card-bg: #161b22;
+            --accent-color: #00f0ff;
+            --secondary-color: #ff007f;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-card {
+            background-color: var(--card-bg);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .game-visual {
+            background: linear-gradient(135deg, #1f2430, #0d0f18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+        }
+
+        .game-preview-icon {
+            font-size: 4rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .game-info {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .game-info h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        .game-info p {
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .play-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--accent-color), #0070f3);
+            color: #0d0f18;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+            transition: all 0.2s ease-in-out;
+            align-self: flex-start;
+        }
+
+        .play-btn:hover {
+            opacity: 0.9;
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            border-top: 1px solid #21262d;
+        }
+
+        @media (max-width: 768px) {
+            .game-card {
+                grid-template-columns: 1fr;
+            }
+            .game-visual {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>NEOPIX KOREA ARCADE</h1>
+        <p>클래식의 재해석, 웹 브라우저에서 즐기는 인터랙티브 아케이드</p>
+    </header>
+
+    <div class="container">
+        <div class="game-card">
+            <div class="game-visual">
+                <div class="game-preview-icon">🧱 🔴 🏓</div>
+            </div>
+            <div class="game-info">
+                <h2>브릭 브레이커 (Brick Breaker)</h2>
+                <p>패들을 조작해 공을 튕겨내고 모든 벽돌을 격파하세요! 빠르고 짜릿한 반사 신경 테스트가 기다리고 있습니다.</p>
+                <a href="./game/" class="play-btn">게임 플레이하기</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Neopix Korea. All Rights Reserved.</p>
+    </footer>
+
+</body>
 </html>
