@@ -7,7 +7,7 @@ MAKE · CONNECT · BUILD 소개와 MAKE 1–15강 썸네일 목록을 제공하�
 `index.html`을 브라우저에서 열면 됩니다. 별도의 빌드나 패키지 설치는 필요하지 않습니다. 일반 정적 웹호스팅 또는 GitHub Pages에도 올릴 수 있습니다.
 
 - 첫 화면: `index.html#/`
-- MAKE 목록: `index.html#/make`
+- MAKE 목록: `make/index.html` (기존 `index.html#/make` 주소도 지원)
 - 강의 검색 및 브라우저 뒤로 가기 지원
 
 ## 강의 콘텐츠
