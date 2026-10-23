@@ -16,7 +16,7 @@ const lessons = [
   ['‘경영학원론’ 주교재 소개', 'PAfDUZCYXco'],
   ['e북 알라딘 뷰어 설치하는 법', 'oGvvyBPdN9o'],
 ].map(([title, videoId], index) => ({
-  number: index + 1, title, videoId,
+  number: index + 1, title: `메이크 ${index + 1}강`, videoId,
   description: '아래에서 강의 영상을 시청하세요.',
   videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
 }));
