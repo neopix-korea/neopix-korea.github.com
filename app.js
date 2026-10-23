@@ -18,6 +18,10 @@ function renderLessons(query) {
 }
 
 function route() {
+  if (location.hash === '#/make') {
+    location.replace(new URL('make/index.html', document.baseURI).href);
+    return;
+  }
   const lessonMatch = !location.hash && location.pathname.match(/\/make\/(\d{2})\/(?:index\.html)?$/);
   if (lessonMatch) {
     const lesson = lessons.find(item => item.number === Number(lessonMatch[1]));
