@@ -6,7 +6,7 @@ function renderHome() {
 }
 
 function renderMake() {
-  app.innerHTML = `<div class="breadcrumb"><a href="#/">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>영상 순차 공개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section aria-labelledby="lessons-title"><div class="toolbar"><h2 id="lessons-title">강의 목록 <span id="lesson-count">15 LESSONS</span></h2><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></section>`;
+  app.innerHTML = `<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>영상 순차 공개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section aria-labelledby="lessons-title"><div class="toolbar"><h2 id="lessons-title">강의 목록 <span id="lesson-count">15 LESSONS</span></h2><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></section>`;
   renderLessons('');
   app.querySelector('input').addEventListener('input', event => renderLessons(event.target.value));
 }
@@ -18,6 +18,10 @@ function renderLessons(query) {
 }
 
 function route() {
+  if (location.hash === '#/' || location.hash === '#') {
+    location.replace(new URL('./', document.baseURI).href);
+    return;
+  }
   if (location.hash === '#/make') {
     location.replace(new URL('make/index.html', document.baseURI).href);
     return;
@@ -34,7 +38,7 @@ function route() {
       return;
     }
   }
-  const isMake = location.hash === '#/make' || (!location.hash && /\/make\/(?:index\.html)?$/.test(location.pathname));
+  const isMake = /\/make\/(?:index\.html)?$/.test(location.pathname);
   document.title = isMake ? 'MAKE · 1–15강 | AI BOOTCAMP' : 'AI BOOTCAMP · 온라인 강의실';
   for (const [id, active] of [['home-link', !isMake], ['make-link', isMake]]) {
     const link = document.getElementById(id);
@@ -49,5 +53,5 @@ route();
 function renderLesson(lesson) {
   const number = String(lesson.number).padStart(2, '0');
   const neighbor = (value, label) => `<a class="lesson-nav-link" href="make/${String(value).padStart(2, '0')}/">${label} · ${value}강</a>`;
-  app.innerHTML = `<div class="breadcrumb"><a href="index.html">강의 소개</a><span>/</span><a href="make/index.html">MAKE</a><span>/</span>${lesson.number}강</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · LESSON ${number}</div><h1>${lesson.title}</h1><p class="intro">${lesson.description}</p></section><section class="lesson-room" aria-label="${lesson.title} 강의실"><div><img class="lesson-cover" src="make/thumbnails/${number}.svg" alt="MAKE ${lesson.number}강 썸네일" width="960" height="540"><div class="video-placeholder"><strong>강의 영상 준비 중</strong><p>영상이 공개되면 이곳에서 시청할 수 있습니다.</p></div></div><aside class="lesson-info"><span class="pill">MAKE · ${number} / 15</span><h2>이번 강의 안내</h2><p>강의 내용과 학습 자료는 순차적으로 공개됩니다.</p><hr><h2>과제 안내</h2><p>과제 내용과 제출 방법은 강의 공개 시 안내합니다.</p><a class="back-to-lessons" href="make/index.html">전체 15강 목록 보기 ↗</a></aside></section><nav class="lesson-navigation" aria-label="강의 이동">${lesson.number > 1 ? neighbor(lesson.number - 1, '← 이전 강의') : '<span></span>'}<a href="make/index.html">강의 목록</a>${lesson.number < 15 ? neighbor(lesson.number + 1, '다음 강의 →') : '<span></span>'}</nav>`;
+  app.innerHTML = `<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span><a href="make/index.html">MAKE</a><span>/</span>${lesson.number}강</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · LESSON ${number}</div><h1>${lesson.title}</h1><p class="intro">${lesson.description}</p></section><section class="lesson-room" aria-label="${lesson.title} 강의실"><div><img class="lesson-cover" src="make/thumbnails/${number}.svg" alt="MAKE ${lesson.number}강 썸네일" width="960" height="540"><div class="video-placeholder"><strong>강의 영상 준비 중</strong><p>영상이 공개되면 이곳에서 시청할 수 있습니다.</p></div></div><aside class="lesson-info"><span class="pill">MAKE · ${number} / 15</span><h2>이번 강의 안내</h2><p>강의 내용과 학습 자료는 순차적으로 공개됩니다.</p><hr><h2>과제 안내</h2><p>과제 내용과 제출 방법은 강의 공개 시 안내합니다.</p><a class="back-to-lessons" href="make/index.html">전체 15강 목록 보기 ↗</a></aside></section><nav class="lesson-navigation" aria-label="강의 이동">${lesson.number > 1 ? neighbor(lesson.number - 1, '← 이전 강의') : '<span></span>'}<a href="make/index.html">강의 목록</a>${lesson.number < 15 ? neighbor(lesson.number + 1, '다음 강의 →') : '<span></span>'}</nav>`;
 }
