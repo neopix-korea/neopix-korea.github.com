@@ -59,7 +59,7 @@ function route() {
     }
   }
   const isMake = /\/make\/(?:index\.html)?$/.test(location.pathname);
-  document.title = isMake ? 'MAKE · 1–15강 | AI BOOTCAMP' : 'AI BOOTCAMP · 온라인 강의실';
+  document.title = isMake ? 'MAKE · 1–15강 | AI BOOTCAMP' : '인공지능 부트캠프 | 이현구 · 네오픽스코리아';
   for (const [id, active] of [['home-link', !isMake], ['make-link', isMake]]) {
     const link = document.getElementById(id);
     if (active) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
