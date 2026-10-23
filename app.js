@@ -38,6 +38,21 @@ function renderLessons(query) {
 }
 
 function route() {
+  const chapterMatch = location.pathname.match(/\/(connect|build)\/(?:index\.html)?$/);
+  if (chapterMatch) {
+    const key = chapterMatch[1];
+    const name = key.toUpperCase();
+    const title = key === 'connect' ? '도구와 아이디어 연결하기' : '나만의 프로젝트 완성하기';
+    document.title = `${name} 강의실 | AI BOOTCAMP`;
+    for (const id of ['home-link', 'make-link', 'connect-link', 'build-link']) {
+      const link = document.getElementById(id);
+      if (id === `${key}-link`) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+    app.innerHTML = `<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>${name}</div><section class="course-hero"><div class="eyebrow">CHAPTER ${key === 'connect' ? '02' : '03'} · ${name}</div><h1>${title}</h1><p class="intro">${name} 강의실입니다. 강의는 준비가 완료되는 대로 공개됩니다.</p></section><div class="empty"><h2>강의 공개 준비 중</h2><p>강의 목록과 학습 자료를 준비하고 있습니다.</p><a class="back-to-lessons" href="./">강의 소개로 돌아가기 ↗</a></div>`;
+    window.scrollTo(0, 0);
+    return;
+  }
   if (location.hash === '#/' || location.hash === '#') {
     location.replace(new URL('./', document.baseURI).href);
     return;
