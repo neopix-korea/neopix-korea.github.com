@@ -14,10 +14,22 @@ function renderMake() {
 function renderLessons(query) {
   const filtered = lessons.filter(lesson => `${lesson.title} ${lesson.number}강`.toLowerCase().includes(query.trim().toLowerCase()));
   document.querySelector('#lesson-count').textContent = `${filtered.length} LESSONS`;
-  document.querySelector('#lesson-list').innerHTML = filtered.length ? filtered.map(lesson => `<article class="lesson"><div class="thumbnail" data-number="${String(lesson.number).padStart(2,'0')}" role="img" aria-label="MAKE ${lesson.number}강 썸네일"><small>AI BOOTCAMP / ${String(lesson.number).padStart(2,'0')}</small><strong>MAKE.</strong></div><div class="lesson-copy"><small>LESSON ${String(lesson.number).padStart(2,'0')}</small><h3>${lesson.title}</h3><p>${lesson.description}</p></div><span class="lesson-status">영상 준비 중</span></article>`).join('') : '<p class="empty">검색한 강의가 없습니다. 다른 검색어를 입력해 주세요.</p>';
+  document.querySelector('#lesson-list').innerHTML = filtered.length ? filtered.map(lesson => `<a class="lesson" href="make/${String(lesson.number).padStart(2,'0')}/"><img class="thumbnail lesson-thumbnail" src="make/thumbnails/${String(lesson.number).padStart(2,'0')}.svg" width="960" height="540" alt="MAKE ${lesson.number}강 썸네일" loading="lazy"><div class="lesson-copy"><small>LESSON ${String(lesson.number).padStart(2,'0')}</small><h3>${lesson.title}</h3><p>${lesson.description}</p></div><span class="lesson-status">강의실 입장 ↗</span></a>`).join('') : '<p class="empty">검색한 강의가 없습니다. 다른 검색어를 입력해 주세요.</p>';
 }
 
 function route() {
+  const lessonMatch = !location.hash && location.pathname.match(/\/make\/(\d{2})\/(?:index\.html)?$/);
+  if (lessonMatch) {
+    const lesson = lessons.find(item => item.number === Number(lessonMatch[1]));
+    if (lesson) {
+      document.title = `${lesson.title} | AI BOOTCAMP`;
+      document.getElementById('make-link').setAttribute('aria-current', 'page');
+      document.getElementById('home-link').removeAttribute('aria-current');
+      renderLesson(lesson);
+      window.scrollTo(0, 0);
+      return;
+    }
+  }
   const isMake = location.hash === '#/make' || (!location.hash && /\/make\/(?:index\.html)?$/.test(location.pathname));
   document.title = isMake ? 'MAKE · 1–15강 | AI BOOTCAMP' : 'AI BOOTCAMP · 온라인 강의실';
   for (const [id, active] of [['home-link', !isMake], ['make-link', isMake]]) {
@@ -29,3 +41,9 @@ function route() {
 }
 window.addEventListener('hashchange', route);
 route();
+
+function renderLesson(lesson) {
+  const number = String(lesson.number).padStart(2, '0');
+  const neighbor = (value, label) => `<a class="lesson-nav-link" href="make/${String(value).padStart(2, '0')}/">${label} · ${value}강</a>`;
+  app.innerHTML = `<div class="breadcrumb"><a href="index.html">강의 소개</a><span>/</span><a href="make/index.html">MAKE</a><span>/</span>${lesson.number}강</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · LESSON ${number}</div><h1>${lesson.title}</h1><p class="intro">${lesson.description}</p></section><section class="lesson-room" aria-label="${lesson.title} 강의실"><div><img class="lesson-cover" src="make/thumbnails/${number}.svg" alt="MAKE ${lesson.number}강 썸네일" width="960" height="540"><div class="video-placeholder"><strong>강의 영상 준비 중</strong><p>영상이 공개되면 이곳에서 시청할 수 있습니다.</p></div></div><aside class="lesson-info"><span class="pill">MAKE · ${number} / 15</span><h2>이번 강의 안내</h2><p>강의 내용과 학습 자료는 순차적으로 공개됩니다.</p><hr><h2>과제 안내</h2><p>과제 내용과 제출 방법은 강의 공개 시 안내합니다.</p><a class="back-to-lessons" href="make/index.html">전체 15강 목록 보기 ↗</a></aside></section><nav class="lesson-navigation" aria-label="강의 이동">${lesson.number > 1 ? neighbor(lesson.number - 1, '← 이전 강의') : '<span></span>'}<a href="make/index.html">강의 목록</a>${lesson.number < 15 ? neighbor(lesson.number + 1, '다음 강의 →') : '<span></span>'}</nav>`;
+}
