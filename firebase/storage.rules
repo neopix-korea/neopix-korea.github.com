@@ -2,15 +2,18 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     function teacher() {
-      return request.auth != null && request.auth.token.email_verified == true
-        && request.auth.token.email in ['dasahee@yeonsung.ac.kr'];
+      return request.auth != null && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '') in ['dasahee@yeonsung.ac.kr'];
+    }
+    function bootcampStudentLogin() {
+      return request.auth != null && request.auth.token.firebase.sign_in_provider == 'password';
     }
     match /bootcampClassrooms/{room}/{uid}/{submission}/{image} {
-      allow read: if request.auth != null && (request.auth.uid == uid || teacher());
-      allow create: if request.auth != null && request.auth.uid == uid
+      allow read: if teacher() || (bootcampStudentLogin() && request.auth.uid == uid);
+      allow create: if bootcampStudentLogin() && request.auth.uid == uid
         && request.resource.size <= 5 * 1024 * 1024
         && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow delete: if bootcampStudentLogin() && request.auth.uid == uid;
       allow update: if false;
     }
   }

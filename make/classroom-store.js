@@ -18,8 +18,18 @@ export async function connectClassroom() {
   if (!auth.currentUser) await authSDK.signInAnonymously(auth);
   const doc = (path) => dbSDK.doc(db, `${room}/${path}`);
   const rows = (snapshot) => snapshot.docs.map(item => ({ ...item.data(), id: item.id }));
+  let authenticatedStudentId = null;
+  async function studentEmail(studentId) {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${classroomConfig.roomId}:${studentId}`));
+    const key = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+    return `make-${key.slice(0, 48)}@students.neopix.invalid`;
+  }
+  function passwordRequired(password) {
+    if (typeof password !== 'string' || password.length < 8) throw new Error('학생 비밀번호는 8자 이상으로 입력해 주세요.');
+  }
   const store = {
     get user() { return auth.currentUser; },
+    get studentAuthenticated() { return !auth.currentUser.isAnonymous && auth.currentUser.providerData.some(item => item.providerId === 'password'); },
     async isTeacher() {
       const token = await authSDK.getIdTokenResult(auth.currentUser);
       return token.claims.email_verified === true && classroomConfig.professorEmails.includes(token.claims.email);
@@ -35,13 +45,17 @@ export async function connectClassroom() {
       }
     },
     async logout() {
+      authenticatedStudentId = null;
       await authSDK.signOut(auth);
       await authSDK.setPersistence(auth, authSDK.browserLocalPersistence);
       await authSDK.signInAnonymously(auth);
     },
-    watch(collection, receive, fail, studentId) {
+    watch(collection, receive, fail, ownOnly) {
       let source = dbSDK.collection(db, `${room}/${collection}`);
-      if (studentId) source = dbSDK.query(source, dbSDK.where('studentId', '==', studentId));
+      if (ownOnly) {
+        if (!store.studentAuthenticated || !authenticatedStudentId) throw new Error('본인 아이디로 먼저 로그인해 주세요.');
+        source = dbSDK.query(source, dbSDK.where('studentId', '==', authenticatedStudentId));
+      }
       return dbSDK.onSnapshot(source, { includeMetadataChanges: true }, snapshot => {
         receive(rows(snapshot), !snapshot.metadata.fromCache);
       }, fail);
@@ -51,22 +65,47 @@ export async function connectClassroom() {
       if (!value.exists()) return null;
       const entry = value.data();
       const student = await dbSDK.getDoc(doc(`students/${entry.studentId}`));
-      return student.exists() ? { ...entry, name: student.data().name } : null;
+      if (!student.exists() || student.data().createdBy !== auth.currentUser.uid) return null;
+      authenticatedStudentId = entry.studentId;
+      return { ...entry, name: student.data().name };
     },
-    async enter(studentId, seat) {
+    async enter(studentId, seat, password) {
+      const email = await studentEmail(studentId);
+      if (!store.studentAuthenticated || auth.currentUser.email !== email) {
+        passwordRequired(password);
+        await authSDK.setPersistence(auth, authSDK.browserLocalPersistence);
+        await authSDK.signInWithEmailAndPassword(auth, email, password);
+      }
       const student = await dbSDK.getDoc(doc(`students/${studentId}`));
-      if (!student.exists()) throw new Error('등록된 아이디를 선택해 주세요.');
+      if (!student.exists() || student.data().createdBy !== auth.currentUser.uid) throw new Error('본인 아이디로 로그인해 주세요.');
       const entry = { studentId, seat, updatedAt: dbSDK.serverTimestamp() };
       await dbSDK.setDoc(doc(`devices/${auth.currentUser.uid}`), entry);
+      authenticatedStudentId = studentId;
       return { studentId, seat, name: student.data().name };
     },
-    async register(studentId, name, seat) {
+    async register(studentId, name, seat, password) {
+      passwordRequired(password);
+      const target = doc(`students/${studentId}`);
+      if ((await dbSDK.getDoc(target)).exists()) throw new Error('이미 사용 중인 아이디입니다. 기존 아이디로 로그인해 주세요.');
+      const email = await studentEmail(studentId);
+      await authSDK.setPersistence(auth, authSDK.browserLocalPersistence);
+      if (auth.currentUser.isAnonymous) {
+        await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(email, password));
+      } else if (auth.currentUser.email !== email) {
+        throw new Error('먼저 로그아웃한 후 새 아이디를 등록해 주세요.');
+      }
       await dbSDK.runTransaction(db, async transaction => {
-        const target = doc(`students/${studentId}`);
         if ((await transaction.get(target)).exists()) throw new Error('이미 사용 중인 아이디입니다. 기존 아이디로 입장해 주세요.');
         transaction.set(target, { name, createdBy: auth.currentUser.uid, createdAt: dbSDK.serverTimestamp() });
       });
       return store.enter(studentId, seat);
+    },
+    async activate(identity, password) {
+      passwordRequired(password);
+      const student = await dbSDK.getDoc(doc(`students/${identity.studentId}`));
+      if (!student.exists() || student.data().createdBy !== auth.currentUser.uid || !auth.currentUser.isAnonymous) throw new Error('처음 아이디를 만든 기기에서 비밀번호를 설정해 주세요.');
+      await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(await studentEmail(identity.studentId), password));
+      return store.enter(identity.studentId, identity.seat);
     },
     async publish(title, description) {
       await dbSDK.addDoc(dbSDK.collection(db, `${room}/assignments`), {

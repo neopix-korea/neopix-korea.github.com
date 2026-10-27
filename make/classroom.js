@@ -1,4 +1,4 @@
-import { connectClassroom } from './classroom-store.js';
+import { connectClassroom } from './classroom-store.js?v=20261027-private-submissions';
 import { classroomConfig } from './classroom-config.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
@@ -13,7 +13,11 @@ function safeUrl(value) {
 function message(error) {
   const code = error?.code || '';
   if (/permission-denied|unauthorized/.test(code)) return '접근 권한을 확인할 수 없습니다. 교수님께 Firebase 권한 설정을 확인해 달라고 요청해 주세요.';
-  if (/invalid-credential|wrong-password|user-not-found/.test(code)) return '교수 이메일 또는 비밀번호를 확인해 주세요.';
+  if (/invalid-credential|wrong-password|user-not-found/.test(code)) return '아이디 또는 비밀번호를 확인해 주세요.';
+  if (/email-already-in-use|credential-already-in-use/.test(code)) return '이미 등록된 아이디입니다. 기존 아이디와 비밀번호로 로그인해 주세요.';
+  if (/weak-password/.test(code)) return '비밀번호는 8자 이상으로 입력해 주세요.';
+  if (/popup-blocked/.test(code)) return 'Google 로그인 창을 열 수 없습니다. 브라우저에서 팝업을 허용해 주세요.';
+  if (/popup-closed-by-user|cancelled-popup-request/.test(code)) return 'Google 로그인이 취소되었습니다. 다시 로그인해 주세요.';
   if (/network|unavailable/.test(code)) return '서버에 연결할 수 없습니다. 인터넷 연결을 확인해 주세요.';
   if (/operation-not-allowed/.test(code)) return 'Firebase 로그인 방식이 아직 설정되지 않았습니다.';
   return error?.message || '처리하지 못했습니다. 다시 시도해 주세요.';
@@ -52,7 +56,7 @@ async function mount() {
     return '<option value="">본인 아이디를 선택하세요</option>' + students.map(item => `<option value="${esc(item.id)}">${esc(item.id)} · ${esc(item.name)}</option>`).join('');
   }
   function entryMarkup() {
-    return `<div class="work-entry"><div><h3>한 번 입장하면 이 기기에서 기억해요</h3><p>스마트폰과 PC에서 같은 아이디를 사용하세요. 한 번 입장하면 다음 제출부터 본인을 다시 선택하지 않아도 됩니다.</p></div><aside class="work-seat-guide" id="work-seat-guide"><strong>스마트폰으로 접속하셨나요?</strong><p>좌석번호는 첫날 배정받은 <b>실습용 PC의 좌석번호</b>입니다. 스마트폰에서도 PC에서 사용한 번호와 똑같이 입력하세요. 번호를 모르면 임의로 입력하지 말고 교수님께 확인해 주세요.</p><p>PC 고장 등으로 자리를 옮겼다면 <b>이동한 PC의 새 좌석번호</b>를 입력하세요. 아이디는 기존 것을 그대로 사용합니다.</p></aside><form id="work-enter"><label>기존 아이디<select name="studentId" required>${studentOptions()}</select></label><label>실습용 PC 좌석번호<input aria-describedby="work-seat-guide" name="seat" inputmode="numeric" type="number" min="1" max="999" required placeholder="예: 12"></label><button class="work-button">이 기기에서 입장</button></form><details class="work-register"><summary>처음이라면 · 내 아이디 만들기</summary><form id="work-register"><label>사용할 아이디<input name="studentId" minlength="2" maxlength="24" pattern="[a-zA-Z0-9가-힣_-]{2,24}" required placeholder="예: hong12" autocapitalize="none" spellcheck="false"></label><label>이름<input name="name" maxlength="30" required autocomplete="name"></label><label>실습용 PC 좌석번호<input aria-describedby="work-seat-guide" name="seat" type="number" min="1" max="999" required inputmode="numeric"></label><button class="work-button">등록하고 입장</button></form><p>아이디는 한글·영문·숫자·밑줄·하이픈 2~24자로 만들어 주세요.</p></details></div>`;
+    return `<div class="work-entry"><div><h3>한 번 로그인하면 이 기기에서 기억해요</h3><p>스마트폰과 PC에서 같은 아이디를 사용하세요. 아이디 선택 후 비밀번호로 로그인하세요. 다음 제출부터는 이 기기에서 자동으로 입장하며, 본인 제출물만 확인할 수 있습니다.</p></div><aside class="work-seat-guide" id="work-seat-guide"><strong>스마트폰으로 접속하셨나요?</strong><p>좌석번호는 첫날 배정받은 <b>실습용 PC의 좌석번호</b>입니다. 스마트폰에서도 PC에서 사용한 번호와 똑같이 입력하세요. 번호를 모르면 임의로 입력하지 말고 교수님께 확인해 주세요.</p><p>PC 고장 등으로 자리를 옮겼다면 <b>이동한 PC의 새 좌석번호</b>를 입력하세요. 아이디는 기존 것을 그대로 사용합니다.</p></aside><form id="work-enter"><label>기존 아이디${identity && store.studentAuthenticated ? `<input name="studentId" value="${esc(identity.studentId)}" readonly>` : `<select name="studentId" required>${studentOptions()}</select>`}</label>${identity && store.studentAuthenticated ? '' : '<label>비밀번호<input name="password" type="password" minlength="8" required autocomplete="current-password"></label>'}<label>실습용 PC 좌석번호<input aria-describedby="work-seat-guide" name="seat" inputmode="numeric" type="number" min="1" max="999" required placeholder="예: 12"></label><button class="work-button">${identity && store.studentAuthenticated ? '좌석 변경 저장' : '학생 로그인'}</button></form><details class="work-register"><summary>처음이라면 · 내 아이디 만들기</summary><form id="work-register"><label>사용할 아이디<input name="studentId" minlength="2" maxlength="24" pattern="[a-zA-Z0-9가-힣_-]{2,24}" required placeholder="예: hong12" autocapitalize="none" spellcheck="false"></label><label>이름<input name="name" maxlength="30" required autocomplete="name"></label><label>비밀번호<input name="password" type="password" minlength="8" required autocomplete="new-password" placeholder="8자 이상"></label><label>비밀번호 확인<input name="passwordConfirm" type="password" minlength="8" required autocomplete="new-password"></label><label>실습용 PC 좌석번호<input aria-describedby="work-seat-guide" name="seat" type="number" min="1" max="999" required inputmode="numeric"></label><button class="work-button">등록하고 로그인</button></form><p>아이디는 한글·영문·숫자·밑줄·하이픈 2~24자로 만들어 주세요.</p></details></div>`;
   }
   function assignmentOptions() {
     return assignments.filter(item => item.open).map(item => `<option value="${esc(item.id)}">${esc(item.title)}</option>`).join('');
@@ -66,10 +70,12 @@ async function mount() {
     if (teacher) {
       main.innerHTML = `<div class="work-teacher-tools"><strong>교수 전용 · 과제 관리</strong><a class="work-button secondary" href="make/index.html?screen=1#classroom-root" target="_blank" rel="noopener">스크린 화면 열기 ↗</a></div><details class="work-publish"><summary>＋ 새 과제 출제</summary><form id="work-publish"><label>과제 제목<input name="title" required maxlength="120" placeholder="예: 나만의 홈페이지 만들기"></label><label>과제 안내<textarea name="description" required maxlength="4000" rows="4"></textarea></label><button class="work-button">과제 공개</button></form></details><div class="work-assignment-list"></div><div class="work-board-heading"><h3>실시간 제출 현황 <span class="work-total"></span></h3><label>과제별 보기<select id="work-filter"><option value="">모든 과제</option>${assignments.map(item => `<option value="${esc(item.id)}">${esc(item.title)}</option>`).join('')}</select></label></div><div class="work-feed"></div>`;
       main.querySelector('#work-filter').value = filterId;
+    } else if (identity && !store.studentAuthenticated) {
+      main.innerHTML = `<form id="work-activate" class="work-login"><h3>기존 아이디에 비밀번호 설정</h3><p class="work-help">${esc(identity.name)} · ${esc(identity.studentId)}<br>본인 제출물만 확인할 수 있도록 이 아이디를 처음 만든 기기에서 비밀번호를 설정해 주세요. 이후 다른 기기에서도 같은 아이디와 비밀번호로 로그인할 수 있습니다.</p><label>비밀번호<input name="password" type="password" minlength="8" required autocomplete="new-password" placeholder="8자 이상"></label><label>비밀번호 확인<input name="passwordConfirm" type="password" minlength="8" required autocomplete="new-password"></label><button class="work-button">비밀번호 설정하고 로그인</button><button type="button" data-action="student-logout" class="work-button secondary">다른 아이디로 로그인</button></form>`;
     } else if (!identity) {
       main.innerHTML = entryMarkup();
     } else {
-      main.innerHTML = `<div class="work-identity"><div><strong>${esc(identity.name)} <span>${esc(identity.studentId)}</span></strong><p>실습용 PC ${esc(identity.seat)}번 좌석 · 이 브라우저에서 입장 정보를 기억합니다.</p><p>스마트폰에서도 배정받은 PC의 좌석번호를 사용합니다. 자리를 옮겼다면 ‘입장 정보 변경’에서 새 좌석번호를 입력해 주세요.</p></div><button class="work-button secondary" type="button" data-action="change">입장 정보 변경</button></div><div class="work-assignment-list"></div><form id="work-submit"><h3>작품 제출하기</h3><label>제출할 과제<select name="assignmentId" required>${assignmentOptions() || '<option value="">현재 제출 가능한 과제가 없습니다</option>'}</select></label><label>작품 유형<select name="kind"><option value="website">홈페이지 · GitHub Pages 등</option><option value="music">음악 · Suno 공유 링크</option>${classroomConfig.imageUploadsEnabled ? '<option value="image">이미지 작품</option>' : ''}</select></label><label>결과물 주소<input name="url" type="url" maxlength="2000" placeholder="https://…" inputmode="url"></label><label>작품 설명<textarea name="description" rows="3" maxlength="2000" placeholder="어떤 결과물을 만들었나요?"></textarea></label>${classroomConfig.imageUploadsEnabled ? `<label class="work-upload">이미지 첨부<input name="images" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span>최대 3장 · 장당 5MB · JPG, PNG, WebP, GIF</span></label><div class="work-previews"></div>` : '<p class="work-help">이미지 첨부는 준비 중입니다. 현재는 홈페이지·Suno 공유 링크로 제출해 주세요.</p>'}<p class="work-help">${classroomConfig.imageUploadsEnabled ? '주소 또는 이미지를 하나 이상 제출하세요.' : '완성한 작품의 공유 주소를 입력해 주세요.'} 제출물은 교수님과 수업 스크린에서 함께 검토합니다. 음악은 교수님 PC에서 선택해 재생합니다.</p><button class="work-button" ${assignments.some(item => item.open) ? '' : 'disabled'}>과제 제출</button></form><div class="work-board-heading"><h3>내 제출 내역</h3></div><div class="work-feed"></div>`;
+      main.innerHTML = `<div class="work-identity"><div><strong>${esc(identity.name)} <span>${esc(identity.studentId)}</span></strong><p>실습용 PC ${esc(identity.seat)}번 좌석 · 이 브라우저에서 입장 정보를 기억합니다.</p><p>스마트폰에서도 배정받은 PC의 좌석번호를 사용합니다. 자리를 옮겼다면 ‘좌석 변경’에서 새 좌석번호를 입력해 주세요.</p></div><div class="work-identity-actions"><button class="work-button secondary" type="button" data-action="change">좌석 변경</button><button class="work-button secondary" type="button" data-action="student-logout">학생 로그아웃</button></div></div><div class="work-assignment-list"></div><form id="work-submit"><h3>작품 제출하기</h3><label>제출할 과제<select name="assignmentId" required>${assignmentOptions() || '<option value="">현재 제출 가능한 과제가 없습니다</option>'}</select></label><label>작품 유형<select name="kind"><option value="website">홈페이지 · GitHub Pages 등</option><option value="music">음악 · Suno 공유 링크</option>${classroomConfig.imageUploadsEnabled ? '<option value="image">이미지 작품</option>' : ''}</select></label><label>결과물 주소<input name="url" type="url" maxlength="2000" placeholder="https://…" inputmode="url"></label><label>작품 설명<textarea name="description" rows="3" maxlength="2000" placeholder="어떤 결과물을 만들었나요?"></textarea></label>${classroomConfig.imageUploadsEnabled ? `<label class="work-upload">이미지 첨부<input name="images" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span>최대 3장 · 장당 5MB · JPG, PNG, WebP, GIF</span></label><div class="work-previews"></div>` : '<p class="work-help">이미지 첨부는 준비 중입니다. 현재는 홈페이지·Suno 공유 링크로 제출해 주세요.</p>'}<p class="work-help">${classroomConfig.imageUploadsEnabled ? '주소 또는 이미지를 하나 이상 제출하세요.' : '완성한 작품의 공유 주소를 입력해 주세요.'} 제출물은 교수님과 수업 스크린에서 함께 검토합니다. 음악은 교수님 PC에서 선택해 재생합니다.</p><button class="work-button" ${assignments.some(item => item.open) ? '' : 'disabled'}>과제 제출</button></form><div class="work-board-heading"><h3>내 제출 내역</h3></div><div class="work-feed"></div>`;
     }
     renderAssignments(); renderFeed();
   }
@@ -109,13 +115,13 @@ async function mount() {
   function watchSubmissions() {
     unsubscribeSubmissions?.();
     submissions = [];
-    if (!teacher && !identity) return;
+    if (!teacher && (!identity || !store.studentAuthenticated)) return;
     unsubscribeSubmissions = store.watch('submissions', (rows, live) => {
       submissions = rows.sort((a, b) => stamp(b) - stamp(a));
       serverConnected = live;
       notify(live ? '서버 연결됨 · 제출 내역이 실시간으로 갱신됩니다.' : '서버 연결 확인 중 · 표시된 내역은 최신이 아닐 수 있습니다.');
       renderFeed();
-    }, fail, teacher ? null : identity.studentId);
+    }, fail, !teacher);
   }
   async function perform(form, task) {
     if (form.id === 'work-submit' && submitting) return;
@@ -135,15 +141,21 @@ async function mount() {
     if (!store) return;
     await perform(form, async () => {
       const data = new FormData(form);
-      if (form.id === 'work-enter' || form.id === 'work-register') {
+      if (form.id === 'work-activate') {
+        if (data.get('password') !== data.get('passwordConfirm')) throw new Error('비밀번호 확인이 일치하지 않습니다.');
+        identity = await store.activate(identity, data.get('password'));
+        render(); watchSubmissions(); notify('비밀번호를 설정했습니다. 본인 제출물만 확인할 수 있습니다.');
+      } else if (form.id === 'work-enter' || form.id === 'work-register') {
         const studentId = data.get('studentId').trim().toLowerCase();
         const seat = Number(data.get('seat'));
-        identity = form.id === 'work-register' ? await store.register(studentId, data.get('name').trim(), seat) : await store.enter(studentId, seat);
+        if (form.id === 'work-register' && data.get('password') !== data.get('passwordConfirm')) throw new Error('비밀번호 확인이 일치하지 않습니다.');
+        identity = form.id === 'work-register' ? await store.register(studentId, data.get('name').trim(), seat, data.get('password')) : await store.enter(studentId, seat, data.get('password'));
         render(); watchSubmissions(); notify(`${identity.name}님으로 입장했습니다. 다음부터 이 브라우저에서 바로 제출할 수 있습니다.`);
       } else if (form.id === 'work-publish') {
         await store.publish(data.get('title').trim(), data.get('description').trim());
         form.reset(); notify('과제를 공개했습니다. 학생 화면에 바로 표시됩니다.');
       } else if (form.id === 'work-login') {
+        notify('Google 로그인 창에서 교수 계정을 선택해 주세요. 창이 보이지 않으면 브라우저의 팝업 허용을 확인해 주세요.');
         await store.login();
         teacher = true; identity = null; render(); watchSubmissions(); notify('교수 계정으로 로그인했습니다.');
       } else if (form.id === 'work-submit') {
@@ -195,6 +207,9 @@ async function mount() {
         } else {
           main.innerHTML = `<form id="work-login" class="work-login"><h3>교수 로그인</h3><p class="work-help">기존 교수 계정 ${esc(classroomConfig.professorEmails.join(', '))}으로 로그인하세요.</p><button class="work-button">Google 계정으로 교수 로그인</button><button class="work-button secondary" type="button" data-action="cancel">학생 화면으로</button></form>`;
         }
+      } else if (button.dataset.action === 'student-logout') {
+        unsubscribeSubmissions?.(); submissions = [];
+        await store.logout(); teacher = false; identity = null; render(); notify('로그아웃했습니다. 본인 아이디와 비밀번호로 다시 로그인할 수 있습니다.');
       } else if (button.dataset.action === 'change') {
         main.innerHTML = entryMarkup();
         main.querySelector('#work-enter [name="studentId"]').value = identity.studentId;
@@ -229,7 +244,7 @@ async function mount() {
       students = rows.sort((a, b) => a.id.localeCompare(b.id, 'ko'));
       if (!main.children.length) render();
       // Update the roster without overwriting a draft or a student's typed seat.
-      const select = main.querySelector('#work-enter [name="studentId"]');
+      const select = main.querySelector('#work-enter select[name="studentId"]');
       if (select) { const value = select.value; select.innerHTML = studentOptions(); select.value = value; }
     }, fail));
     subscriptions.push(store.watch('assignments', (rows, live) => {

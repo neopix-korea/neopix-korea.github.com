@@ -3,8 +3,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
     function teacher() {
-      return signedIn() && request.auth.token.email_verified == true
-        && request.auth.token.email in ['dasahee@yeonsung.ac.kr'];
+      return signedIn() && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '') in ['dasahee@yeonsung.ac.kr'];
+    }
+    function bootcampStudentLogin() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider == 'password';
     }
     match /bootcampClassrooms/{room} {
       function student(id) { return get(/databases/$(database)/documents/bootcampClassrooms/$(room)/students/$(id)).data; }
@@ -15,7 +18,7 @@ service cloud.firestore {
       }
       match /students/{id} {
         allow read: if signedIn();
-        allow create: if signedIn()
+        allow create: if bootcampStudentLogin()
           && id.matches('[a-z0-9가-힣_-]{2,24}')
           && request.resource.data.keys().hasOnly(['name', 'createdBy', 'createdAt'])
           && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 30
@@ -25,10 +28,11 @@ service cloud.firestore {
       }
       match /devices/{uid} {
         allow read: if signedIn() && request.auth.uid == uid;
-        allow create, update: if signedIn() && request.auth.uid == uid
+        allow create, update: if bootcampStudentLogin() && request.auth.uid == uid
           && request.resource.data.keys().hasOnly(['studentId', 'seat', 'updatedAt'])
           && request.resource.data.studentId is string
           && exists(/databases/$(database)/documents/bootcampClassrooms/$(room)/students/$(request.resource.data.studentId))
+          && student(request.resource.data.studentId).createdBy == request.auth.uid
           && request.resource.data.seat is int && request.resource.data.seat >= 1 && request.resource.data.seat <= 999
           && request.resource.data.updatedAt == request.time;
         allow delete: if false;
@@ -45,11 +49,12 @@ service cloud.firestore {
         allow delete: if false;
       }
       match /submissions/{id} {
-        allow read: if teacher() || (signedIn() && resource.data.studentId == device().studentId);
-        allow create: if signedIn()
+        allow read: if teacher() || (bootcampStudentLogin() && student(resource.data.studentId).createdBy == request.auth.uid);
+        allow create: if bootcampStudentLogin()
           && request.resource.data.keys().hasOnly(['assignmentId', 'studentId', 'name', 'seat', 'kind', 'url', 'description', 'images', 'createdBy', 'createdAt'])
           && request.resource.data.createdBy == request.auth.uid && request.resource.data.createdAt == request.time
           && request.resource.data.studentId == device().studentId
+          && student(device().studentId).createdBy == request.auth.uid
           && request.resource.data.name == student(device().studentId).name
           && request.resource.data.seat == device().seat
           && request.resource.data.assignmentId is string
