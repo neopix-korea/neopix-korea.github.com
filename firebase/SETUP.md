@@ -3,7 +3,7 @@
 기존 GitHub Pages에서 화면을 제공하고 Firebase Authentication, Cloud Firestore, Storage에서 입장 정보·과제·제출물·이미지를 공유합니다.
 
 1. Firebase 프로젝트에 웹 앱을 등록하고 공개 firebaseConfig를 `make/classroom-config.js`의 `firebase`에 입력합니다. Admin SDK 비밀키는 사용하지 않습니다.
-2. 기존 `yeonsung-ac` 프로젝트의 익명 로그인(등록 전 화면), 이메일/비밀번호 인증(학생), Google 로그인(교수)을 사용합니다. 학생은 직접 만든 아이디와 8자 이상 비밀번호로 로그인합니다. 내부 인증용 이메일은 아이디와 강의실 ID의 SHA-256으로 생성한 가상 주소이며 이메일 수신이나 비밀번호 재설정 메일을 제공하지 않습니다.
+2. 기존 `yeonsung-ac` 프로젝트의 익명 로그인(등록 전 화면), 이메일/비밀번호 인증(학생), Google 로그인(교수)을 사용합니다. 학생은 직접 만든 아이디와 4자 이상 비밀번호로 로그인합니다. 내부 인증용 이메일은 아이디와 강의실 ID의 SHA-256으로 생성한 가상 주소이며 이메일 수신이나 비밀번호 재설정 메일을 제공하지 않습니다.
 3. **운영 프로젝트의 기존 규칙 전체를 이 파일로 덮어쓰면 안 됩니다.** `firebase/firestore.rules`는 부트캠프 전용 규칙을 담은 참고 파일입니다. 기존 규칙을 먼저 백업하고, 바깥쪽 `match /databases/{database}/documents` 안에 전용 함수 및 `bootcampClassrooms` 경로를 병합한 후 게시합니다.
 4. Storage도 기존 규칙을 백업한 후 `firebase/storage.rules`의 전용 함수·경로를 바깥쪽 버킷 match 안에 병합합니다. 기존 경로 규칙을 보존합니다. 추가 IAM 교차 서비스 연결은 사용하지 않습니다.
 5. 교수는 기존 서비스와 같은 `dasahee@yeonsung.ac.kr` Google 계정을 사용합니다. 서버 규칙이 검증된 이메일을 검사하며 별도의 비밀번호나 교사 권한 문서를 만들지 않습니다. Google 로그인을 사용할 사이트 도메인은 Authentication의 승인된 도메인에 등록되어 있어야 합니다.
@@ -28,3 +28,7 @@
 기존 규칙과 병합 파일의 로컬 백업은 `backups/firebase-20261027/`에 있습니다(Git 제외). 이 저장소에는 다른 서비스 전체 규칙을 담은 배포 설정을 두지 않습니다.
 
 공식 참고: [웹 앱 설정](https://firebase.google.com/docs/web/setup), [Firestore 실시간 업데이트](https://firebase.google.com/docs/firestore/query-data/listen), [이미지 업로드](https://firebase.google.com/docs/storage/web/upload-files).
+
+## 학생 비밀번호 길이
+
+입력은 4자 이상입니다. Firebase 자체의 최소 6자 정책과 호환하기 위해 4~5자 입력은 버전·강의실·아이디·비밀번호를 포함한 SHA-256 값으로 변환해 인증합니다. 6자 이상은 기존 값을 그대로 전달해 이전 비밀번호를 보존합니다. 등록·로그인·기존 아이디 비밀번호 설정에서 같은 변환을 사용합니다. 이 변환은 비밀번호 자체의 추측 난이도를 높이지 않습니다. 비밀번호나 변환값을 Firestore에 저장하지 않습니다.

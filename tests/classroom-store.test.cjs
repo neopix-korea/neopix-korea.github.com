@@ -23,6 +23,7 @@ async function setup() {
       setPersistence: async () => {},
       EmailAuthProvider: { credential: (email, password) => ({ email, password }) },
       linkWithCredential: async (user, credential) => {
+        if (credential.password.length < 6) throw Error('Firebase minimum password length is six');
         if (accounts.has(credential.email)) throw Error('duplicate auth account');
         accounts.set(credential.email, { uid: user.uid, password: credential.password });
         auth.currentUser = { uid: user.uid, email: credential.email, isAnonymous: false, providerData: [{ providerId: 'password' }] };
@@ -68,6 +69,24 @@ test('remember identity on device; seat changes preserve submission history', as
   const old = [...env.records.values()].find(row => row.kind === 'website');
   assert.equal(old.studentId, 'student12');
   assert.equal(old.seat, 12);
+});
+
+test('four/five-character passwords support registration and login on another device', async () => {
+  for (const password of ['1234', '12345']) {
+    const env = await setup();
+    await env.store.register('student12', '테스트 수강생', 12, password);
+    env.auth.currentUser = { uid: 'new-device', isAnonymous: true, providerData: [] };
+    assert.equal((await env.store.enter('student12', 24, password)).studentId, 'student12');
+    assert.equal(env.auth.currentUser.uid, 'device-one');
+    env.auth.currentUser = { uid: 'wrong-device', isAnonymous: true, providerData: [] };
+    await assert.rejects(env.store.enter('student12', 24, '9999'), /invalid credentials/);
+  }
+});
+
+test('three-character passwords are rejected before account registration', async () => {
+  const env = await setup();
+  await assert.rejects(env.store.register('student12', '테스트 수강생', 12, '123'), /4자 이상/);
+  assert.equal(env.records.size, 0);
 });
 
 test('same identity on smartphone reuses registration and duplicate ID is rejected', async () => {

@@ -25,7 +25,17 @@ export async function connectClassroom() {
     return `make-${key.slice(0, 48)}@students.neopix.invalid`;
   }
   function passwordRequired(password) {
-    if (typeof password !== 'string' || password.length < 8) throw new Error('학생 비밀번호는 8자 이상으로 입력해 주세요.');
+    if (typeof password !== 'string' || password.length < 4) throw new Error('학생 비밀번호는 4자 이상으로 입력해 주세요.');
+  }
+  async function firebasePassword(studentId, password) {
+    passwordRequired(password);
+    // Firebase requires six characters. Adapt four/five-character classroom
+    // passwords deterministically; keep existing longer credentials unchanged.
+    // This encoding does not increase the entropy of the student's password.
+    if (password.length >= 6) return password;
+    const value = JSON.stringify(['make-short-password-v1', classroomConfig.roomId, studentId, password]);
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+    return [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
   }
   const store = {
     get user() { return auth.currentUser; },
@@ -74,7 +84,7 @@ export async function connectClassroom() {
       if (!store.studentAuthenticated || auth.currentUser.email !== email) {
         passwordRequired(password);
         await authSDK.setPersistence(auth, authSDK.browserLocalPersistence);
-        await authSDK.signInWithEmailAndPassword(auth, email, password);
+        await authSDK.signInWithEmailAndPassword(auth, email, await firebasePassword(studentId, password));
       }
       const student = await dbSDK.getDoc(doc(`students/${studentId}`));
       if (!student.exists() || student.data().createdBy !== auth.currentUser.uid) throw new Error('본인 아이디로 로그인해 주세요.');
@@ -90,7 +100,7 @@ export async function connectClassroom() {
       const email = await studentEmail(studentId);
       await authSDK.setPersistence(auth, authSDK.browserLocalPersistence);
       if (auth.currentUser.isAnonymous) {
-        await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(email, password));
+        await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(email, await firebasePassword(studentId, password)));
       } else if (auth.currentUser.email !== email) {
         throw new Error('먼저 로그아웃한 후 새 아이디를 등록해 주세요.');
       }
@@ -104,7 +114,7 @@ export async function connectClassroom() {
       passwordRequired(password);
       const student = await dbSDK.getDoc(doc(`students/${identity.studentId}`));
       if (!student.exists() || student.data().createdBy !== auth.currentUser.uid || !auth.currentUser.isAnonymous) throw new Error('처음 아이디를 만든 기기에서 비밀번호를 설정해 주세요.');
-      await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(await studentEmail(identity.studentId), password));
+      await authSDK.linkWithCredential(auth.currentUser, authSDK.EmailAuthProvider.credential(await studentEmail(identity.studentId), await firebasePassword(identity.studentId, password)));
       return store.enter(identity.studentId, identity.seat);
     },
     async publish(title, description) {
