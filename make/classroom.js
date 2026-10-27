@@ -1,5 +1,6 @@
 import { connectClassroom } from './classroom-store.js?v=20261027-simple-submit';
 import { classroomConfig } from './classroom-config.js';
+import { submissionRows, submissionReview } from './classroom-review.js?v=20261027-submission-list';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const kindNames = { website: '홈페이지', music: 'Suno 음악', image: '이미지' };
@@ -37,6 +38,7 @@ async function mount() {
   const modal = document.createElement('dialog');
   modal.className = 'work-review-dialog';
   modal.setAttribute('aria-label', '제출물 크게 보기');
+  modal.setAttribute('aria-labelledby', 'work-review-title');
   document.body.append(modal);
   dispose = () => {
     active = false;
@@ -88,8 +90,13 @@ async function mount() {
     const feed = main.querySelector('.work-feed');
     if (!feed) return;
     const filtered = submissions.filter(item => !teacher || !filterId || item.assignmentId === filterId);
+    feed.classList.toggle('work-feed-list', teacher);
     const total = main.querySelector('.work-total');
     if (total) total.textContent = `${filtered.length}개 작품 · ${new Set(filtered.map(item => item.studentId)).size}명 제출`;
+    if (teacher) {
+      feed.innerHTML = submissionRows(filtered, assignments);
+      return;
+    }
     feed.innerHTML = filtered.length ? filtered.map(item => {
       let link = '';
       try { link = safeUrl(item.url || ''); } catch {}
@@ -100,6 +107,17 @@ async function mount() {
     loadImages(feed);
   }
   const imageCache = new Map();
+  function openReview(id) {
+    const visible = submissions.filter(item => !teacher || !filterId || item.assignmentId === filterId);
+    const index = visible.findIndex(item => item.id === id);
+    if (index < 0) return;
+    const item = visible[index];
+    reviewId = id;
+    modal.innerHTML = submissionReview(item, assignments.find(task => task.id === item.assignmentId), index, visible.length);
+    if (!modal.open) modal.showModal();
+    modal.scrollTop = 0;
+    loadImages(modal);
+  }
   async function loadImages(area) {
     for (const holder of area.querySelectorAll('[data-image-path]')) {
       try {
@@ -223,14 +241,20 @@ async function mount() {
         const item = assignments.find(item => item.id === button.dataset.toggleAssignment);
         await store.setOpen(item.id, !item.open);
       } else if (button.dataset.review) {
-        reviewId = button.dataset.review;
-        const item = submissions.find(item => item.id === reviewId);
-        modal.innerHTML = `<button type="button" class="work-button secondary" data-close>닫기 ×</button><h2>${esc(item.name)} · ${esc(item.seat)}번 좌석</h2><p>${esc(item.description)}</p>${item.images.map(path => `<div data-image-path="${esc(path)}">이미지 불러오는 중…</div>`).join('')}`;
-        modal.showModal(); loadImages(modal);
+        openReview(button.dataset.review);
       }
     } catch (error) { button.disabled = false; fail(error); }
   });
-  modal.addEventListener('click', event => { if (event.target.closest('[data-close]')) modal.close(); });
+  modal.addEventListener('click', event => {
+    if (event.target.closest('[data-close]')) modal.close();
+    const step = event.target.closest('[data-review-step]');
+    if (step && !step.disabled) {
+      const visible = submissions.filter(item => !teacher || !filterId || item.assignmentId === filterId);
+      const index = visible.findIndex(item => item.id === reviewId);
+      const next = visible[index + Number(step.dataset.reviewStep)];
+      if (next) openReview(next.id);
+    }
+  });
   try {
     connection ??= connectClassroom().catch(error => { connection = null; throw error; });
     store = await connection;
