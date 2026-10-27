@@ -123,7 +123,10 @@ export async function connectClassroom() {
       });
     },
     async setOpen(id, open) { await dbSDK.updateDoc(doc(`assignments/${id}`), { open }); },
-    async submit({ assignmentId, identity, kind, url, description, files }) {
+    async submit({ assignmentId, identity, url, noUrl = false, description, files }) {
+      if (noUrl) url = '';
+      if (!noUrl && !url && !files.length) throw new Error('결과물 주소나 이미지를 입력하거나 주소 없음을 체크해 주세요.');
+      const kind = url && /^(www\.)?suno\.(com|ai)$/.test(new URL(url).hostname) ? 'music' : (!url && files.length ? 'image' : 'website');
       const target = dbSDK.doc(dbSDK.collection(db, `${room}/submissions`));
       const uploaded = [];
       const images = [];
@@ -138,7 +141,7 @@ export async function connectClassroom() {
         }
         await dbSDK.setDoc(target, {
           assignmentId, studentId: identity.studentId, name: identity.name, seat: identity.seat,
-          kind, url, description, images, createdBy: auth.currentUser.uid,
+          kind, url, noUrl, description, images, createdBy: auth.currentUser.uid,
           createdAt: dbSDK.serverTimestamp(),
         });
         committed = true;

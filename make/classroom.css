@@ -3,3 +3,5 @@
 .work-seat-guide{margin:20px 0;padding:16px 18px;background:#f2f6ec;border-left:3px solid #88ad3c;border-radius:6px}.work-seat-guide strong{font-size:14px;color:#3c562d}.work-seat-guide p{margin:8px 0 0;font-size:13px;line-height:1.9;color:#526447}
 
 #work-enter{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}#work-enter>.work-button{grid-column:1/-1;justify-self:start}.work-identity-actions{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:800px){#work-enter{grid-template-columns:1fr}.work-identity-actions{width:100%}}
+
+#classroom-root .work-no-url{flex-direction:row;align-items:center;gap:9px;justify-self:start;cursor:pointer}#classroom-root .work-no-url input{width:18px;height:18px;margin:0;accent-color:#547b18}#classroom-root input:disabled{background:#eef0ec;color:#7b8276}

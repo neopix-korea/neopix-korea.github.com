@@ -135,3 +135,26 @@ test('legacy device selection cannot impersonate the owner of an existing ID', a
   assert.equal(await env.store.device(), null);
   await assert.rejects(env.store.activate({ studentId: 'student12', seat: 12 }, 'test-only-password'), /처음 아이디를 만든/);
 });
+
+test('explicit no-address submission accepts no URL or image and clears a stale URL', async () => {
+  const env = await setup();
+  const identity = await env.store.register('student12', '테스트 수강생', 12, '1234');
+  await env.store.submit({ assignmentId: 'task', identity, url: 'https://example.com/', noUrl: true, description: '주소 없이 제출', files: [] });
+  const row = [...env.records.values()].find(row => row.assignmentId === 'task');
+  assert.equal(row.url, '');
+  assert.equal(row.noUrl, true);
+  assert.deepEqual(row.images, []);
+});
+
+test('blank submission still requires explicit no-address selection', async () => {
+  const env = await setup();
+  const identity = await env.store.register('student12', '테스트 수강생', 12, '1234');
+  await assert.rejects(env.store.submit({ assignmentId: 'task', identity, url: '', description: '', files: [] }), /주소 없음을 체크/);
+});
+
+test('Suno links are recognized without a manual work-type choice', async () => {
+  const env = await setup();
+  const identity = await env.store.register('student12', '테스트 수강생', 12, '1234');
+  await env.store.submit({ assignmentId: 'task', identity, url: 'https://suno.com/song/test-example', description: '', files: [] });
+  assert.equal([...env.records.values()].find(row => row.assignmentId === 'task').kind, 'music');
+});
