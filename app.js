@@ -25,8 +25,29 @@ function renderHome() {
   app.innerHTML = `<section class="hero"><div><div class="eyebrow">AI BOOTCAMP · ONLINE CLASSROOM</div><h1>생각을 현실로 만드는<br>인공지능 <em>부트캠프.</em></h1><p class="intro">AI와 함께 만들고, 연결하고, 완성하세요.<br>세 개의 챕터를 따라 나만의 가능성을 넓혀가는 실습 중심 강의입니다.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="orbit second"></div><div class="art-core">AI</div><span class="art-tag tag-one">YOUR IDEAS, REALIZED ↗</span><span class="art-tag tag-two">✳ LEARN BY MAKING</span></div></section><section aria-labelledby="chapters-title"><div class="section-heading"><h2 id="chapters-title">우리의 학습 여정</h2><p>세 단계로 시작하는 AI 활용</p></div><div class="chapter-grid"><a class="chapter" href="make/index.html"><div class="chapter-visual"><span class="chapter-number">CHAPTER 01</span><span class="chapter-icon" aria-hidden="true">✳</span><strong>MAKE</strong></div><div class="chapter-body"><h3>AI로 직접 만들기</h3><p>아이디어를 표현하고 결과물을 만드는 첫걸음.<br>AI를 활용하는 즐거움을 실습으로 경험합니다.</p><div class="chapter-bottom"><span>전체 15강</span><span>강의 목록 보기 ↗</span></div></div></a><article class="chapter"><div class="chapter-visual connect"><span class="chapter-number">CHAPTER 02</span><span class="chapter-icon" aria-hidden="true">⌘</span><strong>CONNECT</strong></div><div class="chapter-body"><h3>도구와 아이디어 연결하기</h3><p>다양한 AI 도구와 작업을 연결하며<br>더 넓은 활용 가능성을 발견합니다.</p><div class="chapter-bottom"><span>다음 학습 단계</span><span class="pill">공개 준비 중</span></div></div></article><article class="chapter"><div class="chapter-visual build"><span class="chapter-number">CHAPTER 03</span><span class="chapter-icon" aria-hidden="true">▧</span><strong>BUILD</strong></div><div class="chapter-body"><h3>나만의 프로젝트 완성하기</h3><p>배운 내용을 하나로 모아<br>나만의 프로젝트를 구체화하고 완성합니다.</p><div class="chapter-bottom"><span>마지막 학습 단계</span><span class="pill">공개 준비 중</span></div></div></article></div><aside class="note"><strong>수강 안내 ↗</strong><span>MAKE 챕터에서 1강부터 15강까지 강의 목록을 확인하세요. 각 강의실에서 강의 영상을 시청할 수 있습니다.</span></aside></section>`;
 }
 
+function classroomQr() {
+  return `<section class="classroom-qr" aria-labelledby="qr-title"><div><div class="eyebrow">MAKE · CLASSROOM QR</div><h2 id="qr-title">실습을 시작하는 강의실 QR</h2><p>휴대폰 카메라로 QR코드를 스캔해 MAKE 강의실에 접속하세요.</p><a href="https://neopix-korea.github.io/make/index.html">MAKE 강의실 바로가기 ↗</a></div><button class="qr-expand" type="button" aria-haspopup="dialog"><img src="make/classroom-qr.png" width="144" height="144" alt="MAKE 강의실 접속 QR코드"><span>QR코드 확대보기 ⤢</span></button></section><dialog class="qr-dialog" aria-labelledby="qr-dialog-title"><button class="qr-close" type="button" autofocus aria-label="QR코드 확대보기 닫기">닫기 ×</button><h2 id="qr-dialog-title">MAKE 강의실 접속</h2><img src="make/classroom-qr.png" width="640" height="640" alt="https://neopix-korea.github.io/make/index.html 접속 QR코드"><p>휴대폰 카메라로 QR코드를 스캔하세요.</p></dialog>`;
+}
+
+function bindClassroomQr() {
+  const dialog = app.querySelector('.qr-dialog');
+  app.querySelector('.qr-expand').addEventListener('click', () => {
+    dialog.showModal();
+    document.body.classList.add('qr-open');
+  });
+  dialog.querySelector('.qr-close').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target === dialog) {
+      const bounds = dialog.getBoundingClientRect();
+      if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    }
+  });
+  dialog.addEventListener('close', () => document.body.classList.remove('qr-open'));
+}
+
 function renderMake() {
-  app.innerHTML = `<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section aria-labelledby="lessons-title"><div class="toolbar"><h2 id="lessons-title">강의 목록 <span id="lesson-count">15 LESSONS</span></h2><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></section>`;
+  app.innerHTML = `${classroomQr()}<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section aria-labelledby="lessons-title"><details class="lessons-disclosure"><summary><h2 id="lessons-title">강의 목록 <span>전체 15강</span></h2><span class="lessons-toggle"><span class="when-closed">펼치기 ＋</span><span class="when-open">접기 −</span></span></summary><div class="lessons-content"><div class="toolbar"><span id="lesson-count">15 LESSONS</span><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></div></details></section>`;
+  bindClassroomQr();
   renderLessons('');
   app.querySelector('input').addEventListener('input', event => renderLessons(event.target.value));
 }
