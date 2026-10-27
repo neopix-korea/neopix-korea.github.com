@@ -11,10 +11,10 @@ function timeFor(item) {
 }
 export function submissionRows(items, assignments) {
   if (!items.length) return '<p class="work-empty">아직 제출된 작품이 없습니다.</p>';
-  return `<div class="work-submission-table-wrap"><table class="work-submission-table"><caption>이름을 클릭하면 제출한 과제를 크게 볼 수 있습니다.</caption><thead><tr><th scope="col">좌석</th><th scope="col">이름 · 클릭하여 보기</th><th scope="col">아이디</th><th scope="col">과제</th><th scope="col">제출 시각</th><th scope="col">제출 내용</th></tr></thead><tbody>${items.map(item => {
+  return `<div class="work-submission-table-wrap"><table class="work-submission-table"><caption>아이디를 클릭하면 제출한 과제를 크게 볼 수 있습니다.</caption><thead><tr><th scope="col">좌석</th><th scope="col">아이디 · 클릭하여 보기</th><th scope="col">과제</th><th scope="col">제출 시각</th><th scope="col">제출 내용</th></tr></thead><tbody>${items.map(item => {
     const assignment = assignments.find(task => task.id === item.assignmentId);
     const contents = [item.noUrl ? '주소 없음' : (linkFor(item) ? '결과물 링크' : ''), item.images?.length ? `이미지 ${item.images.length}장` : '', item.description ? '작품 설명' : ''].filter(Boolean).join(' · ') || '제출 완료';
-    return `<tr><td>${esc(item.seat)}번</td><td><button type="button" class="work-student-name" data-review="${esc(item.id)}" aria-label="${esc(item.name)} 제출 과제 크게 보기">${esc(item.name)} <span aria-hidden="true">↗</span></button></td><td>${esc(item.studentId)}</td><td class="work-row-task" title="${esc(assignment?.title || '과제')}">${esc(assignment?.title || '과제')}</td><td><time>${esc(timeFor(item))}</time></td><td>${esc(contents)}</td></tr>`;
+    return `<tr><td>${esc(item.seat)}번</td><td><button type="button" class="work-student-name" data-review="${esc(item.id)}" aria-label="${esc(item.studentId)} 제출 과제 크게 보기">${esc(item.studentId)} <span aria-hidden="true">↗</span></button></td><td class="work-row-task" title="${esc(assignment?.title || '과제')}">${esc(assignment?.title || '과제')}</td><td><time>${esc(timeFor(item))}</time></td><td>${esc(contents)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
 }
 

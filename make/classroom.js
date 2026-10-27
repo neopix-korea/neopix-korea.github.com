@@ -1,6 +1,6 @@
 import { connectClassroom } from './classroom-store.js?v=20261027-simple-submit';
 import { classroomConfig } from './classroom-config.js';
-import { submissionRows, submissionReview } from './classroom-review.js?v=20261027-submission-list';
+import { submissionRows, submissionReview } from './classroom-review.js?v=20261027-submission-id';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const kindNames = { website: '홈페이지', music: 'Suno 음악', image: '이미지' };
