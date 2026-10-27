@@ -46,10 +46,10 @@ function bindClassroomQr() {
 }
 
 function renderMake() {
-  app.innerHTML = `${classroomQr()}<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section aria-labelledby="lessons-title"><details class="lessons-disclosure"><summary><h2 id="lessons-title">강의 목록 <span>전체 15강</span></h2><span class="lessons-toggle"><span class="when-closed">펼치기 ＋</span><span class="when-open">접기 −</span></span></summary><div class="lessons-content"><div class="toolbar"><span id="lesson-count">15 LESSONS</span><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></div></details></section>`;
+  app.innerHTML = `${classroomQr()}<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section id="classroom-root" aria-label="실습 과제 제출"></section><section aria-labelledby="lessons-title"><details class="lessons-disclosure"><summary><h2 id="lessons-title">강의 목록 <span>전체 15강</span></h2><span class="lessons-toggle"><span class="when-closed">펼치기 ＋</span><span class="when-open">접기 −</span></span></summary><div class="lessons-content"><div class="toolbar"><span id="lesson-count">15 LESSONS</span><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></div></details></section>`;
   bindClassroomQr();
   renderLessons('');
-  app.querySelector('input').addEventListener('input', event => renderLessons(event.target.value));
+  app.querySelector('.search').addEventListener('input', event => renderLessons(event.target.value));
 }
 
 function renderLessons(query) {
