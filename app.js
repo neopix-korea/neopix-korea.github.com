@@ -1,7 +1,7 @@
 const app = document.querySelector('#app');
 const lessons = [
   ['제1강 - 경영학이란?', 'Ms46Os7YDOU'],
-  ['제2강 - 기업이란?', 'F5ssIeGTQRw'],
+  ['제2강 - 기업이란?', 'W6pXKyx7y3c'],
   ['제4강 - 고객과 소비자에 대한 이해', '3rTdcbIeaqE'],
   ['제5강 - 시장과 고객에 대한 접근', 'uvu4Jxh951I'],
   ['제6강 - 동기부여와 리더십', 'cnCaVcOEPP0'],
