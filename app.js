@@ -4,7 +4,7 @@ const lessons = [
   ['제2강 - 기업이란?', 'NlVWvmfsPR8'],
   ['제3강 - AI 보이스 클론과 디지털 아바타 만들기', 'pqKbNFiGN2o'],
   ['제4강 - AI로 이미지와 영상 만들기', 'uvu4Jxh951I'],
-  ['제6강 - 동기부여와 리더십', 'cnCaVcOEPP0'],
+  ['제5강 - AI 협업으로 나만의 디지털 프로필 만들기', 'fR5lsZL1uPY'],
   ['제7강 - 인적자원관리', 'lD-CYKQug9k'],
   ['제8강 - 조직의 이해와 설계', 'Yl3SX1CfsQQ'],
   ['제9강 - 회계와 재무의 이해', 'ciev4GvU4gM'],
