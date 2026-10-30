@@ -2,8 +2,8 @@ const app = document.querySelector('#app');
 const lessons = [
   ['제1강 - 경영학이란?', 'W6pXKyx7y3c'],
   ['제2강 - 기업이란?', 'NlVWvmfsPR8'],
-  ['제4강 - 고객과 소비자에 대한 이해', '3rTdcbIeaqE'],
-  ['제4강 - AI로 이미지와 영상 만들기', 'pqKbNFiGN2o'],
+  ['제3강 - AI 보이스 클론과 디지털 아바타 만들기', 'pqKbNFiGN2o'],
+  ['제4강 - AI로 이미지와 영상 만들기', 'uvu4Jxh951I'],
   ['제6강 - 동기부여와 리더십', 'cnCaVcOEPP0'],
   ['제7강 - 인적자원관리', 'lD-CYKQug9k'],
   ['제8강 - 조직의 이해와 설계', 'Yl3SX1CfsQQ'],
