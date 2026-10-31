@@ -1,3 +1,6 @@
+https://neopix-korea.github.io
+
+
 # AI BOOTCAMP 온라인 강의실
 
 MAKE · CONNECT · BUILD 소개와 MAKE 1–15강 썸네일 목록을 제공하는 반응형 정적 웹사이트입니다.
