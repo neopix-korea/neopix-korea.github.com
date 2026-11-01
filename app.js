@@ -1,7 +1,7 @@
 const app = document.querySelector('#app');
 const lessons = [
-  ['제1강 - 경영학이란?', 'W6pXKyx7y3c'],
-  ['제2강 - 기업이란?', 'NlVWvmfsPR8'],
+  ['제1강 - 바이브코딩', 'W6pXKyx7y3c'],
+  ['제2강 - AI 작곡', 'NlVWvmfsPR8'],
   ['제3강 - AI 보이스 클론과 디지털 아바타 만들기', 'pqKbNFiGN2o'],
   ['제4강 - AI로 이미지와 영상 만들기', 'uvu4Jxh951I'],
   ['제5강 - AI 협업으로 나만의 디지털 프로필 만들기', 'fR5lsZL1uPY'],
