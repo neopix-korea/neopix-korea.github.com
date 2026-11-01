@@ -16,7 +16,7 @@ const lessons = [
   ['제14강 - AI 오케스트레이션', 'K2_Fo60VOxo'],
   ['제15강 - AI 캡스톤 프로젝트', 'u08UeZcxsOs'],
 ].map(([title, videoId], index) => ({
-  number: index + 1, title: `메이크 ${index + 1}강`, videoId,
+  number: index + 1, title: `메이크 ${index + 1}강`, topic: title, videoId,
   description: '아래에서 강의 영상을 시청하세요.',
   videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
 }));
@@ -53,9 +53,9 @@ function renderMake() {
 }
 
 function renderLessons(query) {
-  const filtered = lessons.filter(lesson => `${lesson.title} ${lesson.number}강`.toLowerCase().includes(query.trim().toLowerCase()));
+  const filtered = lessons.filter(lesson => `${lesson.title} ${lesson.topic} ${lesson.number}강`.toLowerCase().includes(query.trim().toLowerCase()));
   document.querySelector('#lesson-count').textContent = `${filtered.length} LESSONS`;
-  document.querySelector('#lesson-list').innerHTML = filtered.length ? filtered.map(lesson => `<a class="lesson" href="make/${String(lesson.number).padStart(2,'0')}/"><img class="thumbnail lesson-thumbnail" src="make/thumbnails/${String(lesson.number).padStart(2,'0')}.svg" width="960" height="540" alt="MAKE ${lesson.number}강 썸네일" loading="lazy"><div class="lesson-copy"><small>LESSON ${String(lesson.number).padStart(2,'0')}</small><h3>${lesson.title}</h3><p>${lesson.description}</p></div><span class="lesson-status">강의실 입장 ↗</span></a>`).join('') : '<p class="empty">검색한 강의가 없습니다. 다른 검색어를 입력해 주세요.</p>';
+  document.querySelector('#lesson-list').innerHTML = filtered.length ? filtered.map(lesson => `<a class="lesson" href="make/${String(lesson.number).padStart(2,'0')}/"><img class="thumbnail lesson-thumbnail" src="make/thumbnails/${String(lesson.number).padStart(2,'0')}.svg" width="960" height="540" alt="MAKE ${lesson.number}강 썸네일" loading="lazy"><div class="lesson-copy"><small>LESSON ${String(lesson.number).padStart(2,'0')}</small><h3>${lesson.title}</h3><p>${lesson.description}</p><p class="lesson-topic">${lesson.topic}</p></div><span class="lesson-status">강의실 입장 ↗</span></a>`).join('') : '<p class="empty">검색한 강의가 없습니다. 다른 검색어를 입력해 주세요.</p>';
 }
 
 function route() {
