@@ -158,3 +158,15 @@ test('Suno links are recognized without a manual work-type choice', async () => 
   await env.store.submit({ assignmentId: 'task', identity, url: 'https://suno.com/song/test-example', description: '', files: [] });
   assert.equal([...env.records.values()].find(row => row.assignmentId === 'task').kind, 'music');
 });
+
+ test('arbitrary files retain original names and accept more than three large attachments', async () => {
+  const env = await setup();
+  const identity = await env.store.register('files12', '파일 학생', 12, 'test-password');
+  const files = ['보고서.pdf', '발표.pptx', '코드.zip', '자료.hwp'].map(name => ({name, type: '', size: 20 * 1024 * 1024}));
+  await env.store.submit({assignmentId: 'task', identity, url: '', description: '', files});
+  const saved = [...env.records.entries()].find(([key]) => key.includes('/submissions/'))[1];
+  assert.deepEqual(saved.attachments.map(file => file.name), files.map(file => file.name));
+  assert.equal(saved.attachments.length, 4);
+  assert.equal(saved.kind, 'file');
+  assert.deepEqual(saved.images, []);
+});

@@ -10,9 +10,7 @@ service firebase.storage {
     }
     match /bootcampClassrooms/{room}/{uid}/{submission}/{image} {
       allow read: if teacher() || (bootcampStudentLogin() && request.auth.uid == uid);
-      allow create: if bootcampStudentLogin() && request.auth.uid == uid
-        && request.resource.size <= 5 * 1024 * 1024
-        && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+      allow create: if bootcampStudentLogin() && request.auth.uid == uid;
       allow delete: if bootcampStudentLogin() && request.auth.uid == uid;
       allow update: if false;
     }

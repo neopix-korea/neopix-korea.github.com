@@ -125,23 +125,27 @@ export async function connectClassroom() {
     async setOpen(id, open) { await dbSDK.updateDoc(doc(`assignments/${id}`), { open }); },
     async submit({ assignmentId, identity, url, noUrl = false, description, files }) {
       if (noUrl) url = '';
-      if (!noUrl && !url && !files.length) throw new Error('결과물 주소나 이미지를 입력하거나 주소 없음을 체크해 주세요.');
-      const kind = url && /^(www\.)?suno\.(com|ai)$/.test(new URL(url).hostname) ? 'music' : (!url && files.length ? 'image' : 'website');
+      if (!noUrl && !url && !files.length) throw new Error('결과물 주소나 첨부파일을 입력하거나 주소 없음을 체크해 주세요.');
+      const kind = url && /^(www\.)?suno\.(com|ai)$/.test(new URL(url).hostname) ? 'music' : (!url && files.length ? 'file' : 'website');
       const target = dbSDK.doc(dbSDK.collection(db, `${room}/submissions`));
       const uploaded = [];
       const images = [];
+      const attachments = [];
       let committed = false;
       try {
         for (const file of files) {
           const path = `${room}/${auth.currentUser.uid}/${target.id}/${crypto.randomUUID()}`;
           const object = storageSDK.ref(storage, path);
-          await storageSDK.uploadBytes(object, file, { contentType: file.type });
+          await storageSDK.uploadBytes(object, file, {
+            contentType: file.type || 'application/octet-stream',
+            contentDisposition: `attachment; filename*=UTF-8''${encodeURIComponent(file.name || 'attachment')}`,
+          });
           uploaded.push(path);
-          images.push(await storageSDK.getDownloadURL(object));
+          attachments.push({ name: file.name || 'attachment', type: file.type || 'application/octet-stream', size: file.size || 0, url: await storageSDK.getDownloadURL(object) });
         }
         await dbSDK.setDoc(target, {
           assignmentId, studentId: identity.studentId, name: identity.name, seat: identity.seat,
-          kind, url, noUrl, description, images, createdBy: auth.currentUser.uid,
+          kind, url, noUrl, description, images, attachments, createdBy: auth.currentUser.uid,
           createdAt: dbSDK.serverTimestamp(),
         });
         committed = true;

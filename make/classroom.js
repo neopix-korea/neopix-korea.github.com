@@ -1,9 +1,9 @@
-import { connectClassroom } from './classroom-store.js?v=20261027-simple-submit';
+import { connectClassroom } from './classroom-store.js?v=20261102-files';
 import { classroomConfig } from './classroom-config.js';
-import { submissionRows, submissionReview } from './classroom-review.js?v=20261027-submission-id';
+import { submissionRows, submissionReview } from './classroom-review.js?v=20261102-files';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-const kindNames = { website: '홈페이지', music: 'Suno 음악', image: '이미지' };
+const kindNames = { website: '홈페이지', music: 'Suno 음악', image: '이미지', file: '첨부파일' };
 const stamp = item => item.createdAt?.toMillis?.() || 0;
 function safeUrl(value) {
   if (!value.trim()) return '';
@@ -77,7 +77,7 @@ async function mount() {
     } else if (!identity) {
       main.innerHTML = entryMarkup();
     } else {
-      main.innerHTML = `<div class="work-identity"><div><strong>${esc(identity.name)} <span>${esc(identity.studentId)}</span></strong><p>실습용 PC ${esc(identity.seat)}번 좌석 · 이 브라우저에서 입장 정보를 기억합니다.</p><p>스마트폰에서도 배정받은 PC의 좌석번호를 사용합니다. 자리를 옮겼다면 ‘좌석 변경’에서 새 좌석번호를 입력해 주세요.</p></div><div class="work-identity-actions"><button class="work-button secondary" type="button" data-action="change">좌석 변경</button><button class="work-button secondary" type="button" data-action="student-logout">학생 로그아웃</button></div></div><div class="work-assignment-list"></div><form id="work-submit"><h3>작품 제출하기</h3><label>제출할 과제<select name="assignmentId" required>${assignmentOptions() || '<option value="">현재 제출 가능한 과제가 없습니다</option>'}</select></label><label>결과물 주소<input name="url" type="url" maxlength="2000" placeholder="홈페이지 또는 Suno 공유 주소 https://…" inputmode="url"></label><label class="work-no-url"><input name="noUrl" type="checkbox">주소 없음</label><label>작품 설명<textarea name="description" rows="3" maxlength="2000" placeholder="어떤 결과물을 만들었나요?"></textarea></label>${classroomConfig.imageUploadsEnabled ? `<label class="work-upload">이미지 첨부<input name="images" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><span>최대 3장 · 장당 5MB · JPG, PNG, WebP, GIF</span></label><div class="work-previews"></div>` : '<p class="work-help">이미지 첨부는 준비 중입니다. 현재는 홈페이지·Suno 공유 링크로 제출해 주세요.</p>'}<p class="work-help">${classroomConfig.imageUploadsEnabled ? '주소·이미지를 제출하거나 주소 없음을 체크하세요.' : '공유 주소를 입력하거나 주소 없음을 체크하세요.'} 제출물은 교수님과 수업 스크린에서 함께 검토합니다. 음악은 교수님 PC에서 선택해 재생합니다.</p><button class="work-button" ${assignments.some(item => item.open) ? '' : 'disabled'}>과제 제출</button></form><div class="work-board-heading"><h3>내 제출 내역</h3></div><div class="work-feed"></div>`;
+      main.innerHTML = `<div class="work-identity"><div><strong>${esc(identity.name)} <span>${esc(identity.studentId)}</span></strong><p>실습용 PC ${esc(identity.seat)}번 좌석 · 이 브라우저에서 입장 정보를 기억합니다.</p><p>스마트폰에서도 배정받은 PC의 좌석번호를 사용합니다. 자리를 옮겼다면 ‘좌석 변경’에서 새 좌석번호를 입력해 주세요.</p></div><div class="work-identity-actions"><button class="work-button secondary" type="button" data-action="change">좌석 변경</button><button class="work-button secondary" type="button" data-action="student-logout">학생 로그아웃</button></div></div><div class="work-assignment-list"></div><form id="work-submit"><h3>작품 제출하기</h3><label>제출할 과제<select name="assignmentId" required>${assignmentOptions() || '<option value="">현재 제출 가능한 과제가 없습니다</option>'}</select></label><label>결과물 주소<input name="url" type="url" maxlength="2000" placeholder="홈페이지 또는 Suno 공유 주소 https://…" inputmode="url"></label><label class="work-no-url"><input name="noUrl" type="checkbox">주소 없음</label><label>작품 설명<textarea name="description" rows="3" maxlength="2000" placeholder="어떤 결과물을 만들었나요?"></textarea></label>${classroomConfig.imageUploadsEnabled ? `<label class="work-upload">파일 첨부<input name="images" type="file" multiple><span>모든 파일 형식 첨부 가능 · 여러 파일 선택 가능</span></label><div class="work-previews"></div>` : '<p class="work-help">이미지 첨부는 준비 중입니다. 현재는 홈페이지·Suno 공유 링크로 제출해 주세요.</p>'}<p class="work-help">${classroomConfig.imageUploadsEnabled ? '주소·파일을 제출하거나 주소 없음을 체크하세요.' : '공유 주소를 입력하거나 주소 없음을 체크하세요.'} 제출물은 교수님과 수업 스크린에서 함께 검토합니다. 음악은 교수님 PC에서 선택해 재생합니다.</p><button class="work-button" ${assignments.some(item => item.open) ? '' : 'disabled'}>과제 제출</button></form><div class="work-board-heading"><h3>내 제출 내역</h3></div><div class="work-feed"></div>`;
     }
     renderAssignments(); renderFeed();
   }
@@ -102,7 +102,7 @@ async function mount() {
       try { link = safeUrl(item.url || ''); } catch {}
       const task = assignments.find(task => task.id === item.assignmentId);
       const time = stamp(item) ? new Date(stamp(item)).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '서버 확인 중';
-      return `<article class="work-card"><div class="work-assignment-top"><span class="work-badge">${esc(item.noUrl ? '주소 없음' : (kindNames[item.kind] || '작품'))}</span><time>${esc(time)}</time></div><h4>${esc(item.name)} <span>${esc(item.seat)}번 좌석 · ${esc(item.studentId)}</span></h4><p class="work-card-task">${esc(task?.title || '과제')}</p><p class="work-description">${esc(item.description)}</p>${item.images?.length ? `<button class="work-image-button" type="button" data-review="${esc(item.id)}"><span data-image-path="${esc(item.images[0])}">이미지 불러오는 중…</span><span>이미지 ${item.images.length}장 · 크게 보기 ⤢</span></button>` : ''}${link ? `<a class="work-button secondary" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${item.kind === 'music' ? 'Suno에서 열기 · 교수 PC에서 재생 ↗' : '홈페이지 열기 ↗'}</a>` : ''}</article>`;
+      return `<article class="work-card"><div class="work-assignment-top"><span class="work-badge">${esc(item.noUrl ? '주소 없음' : (kindNames[item.kind] || '작품'))}</span><time>${esc(time)}</time></div><h4>${esc(item.name)} <span>${esc(item.seat)}번 좌석 · ${esc(item.studentId)}</span></h4><p class="work-card-task">${esc(task?.title || '과제')}</p><p class="work-description">${esc(item.description)}</p>${item.attachments?.length ? `<button class="work-button secondary" type="button" data-review="${esc(item.id)}">첨부파일 ${item.attachments.length}개 · 보기</button>` : ''}${item.images?.length ? `<button class="work-image-button" type="button" data-review="${esc(item.id)}"><span data-image-path="${esc(item.images[0])}">이미지 불러오는 중…</span><span>이미지 ${item.images.length}장 · 크게 보기 ⤢</span></button>` : ''}${link ? `<a class="work-button secondary" href="${esc(link)}" target="_blank" rel="noopener noreferrer">${item.kind === 'music' ? 'Suno에서 열기 · 교수 PC에서 재생 ↗' : '홈페이지 열기 ↗'}</a>` : ''}</article>`;
     }).join('') : '<p class="work-empty">아직 제출된 작품이 없습니다.</p>';
     loadImages(feed);
   }
@@ -179,23 +179,15 @@ async function mount() {
       } else if (form.id === 'work-submit') {
         if (!navigator.onLine || !serverConnected) throw new Error('서버 연결 후 제출해 주세요. 입력한 내용은 현재 화면에 유지됩니다.');
         const files = [...(form.querySelector('[name="images"]')?.files || [])];
-        checkFiles(files);
         const noUrl = data.get('noUrl') === 'on';
         const url = noUrl ? '' : safeUrl(data.get('url') || '');
-        if (!noUrl && !url && !files.length) throw new Error('결과물 주소나 이미지를 입력하거나 주소 없음을 체크해 주세요.');
+        if (!noUrl && !url && !files.length) throw new Error('결과물 주소나 첨부파일을 입력하거나 주소 없음을 체크해 주세요.');
         notify('작품을 업로드하고 서버에 저장하는 중입니다. 창을 닫지 마세요.');
         await store.submit({ assignmentId: data.get('assignmentId'), identity, url, noUrl, description: data.get('description').trim(), files });
         form.reset(); form.querySelector('[name="url"]').disabled = false; clearPreviews(); notify('제출이 완료되었습니다. 교수 화면에 작품이 전달되었습니다.');
       }
     });
   });
-  function checkFiles(files) {
-    if (files.length > 3) throw new Error('이미지는 최대 3장까지 첨부해 주세요.');
-    for (const file of files) {
-      if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) throw new Error('JPG, PNG, WebP, GIF 이미지만 첨부할 수 있습니다.');
-      if (file.size > 5 * 1024 * 1024) throw new Error('이미지 한 장의 크기는 5MB 이하여야 합니다.');
-    }
-  }
   function clearPreviews() {
     imagePreviews.forEach(URL.revokeObjectURL); imagePreviews = [];
     main.querySelector('.work-previews')?.replaceChildren();
@@ -209,11 +201,10 @@ async function mount() {
     if (event.target.name === 'images') {
       clearPreviews();
       try {
-        const files = [...event.target.files]; checkFiles(files);
+        const files = [...event.target.files];
         for (const file of files) {
-          const url = URL.createObjectURL(file); imagePreviews.push(url);
-          const image = new Image(); image.src = url; image.alt = file.name;
-          main.querySelector('.work-previews').append(image);
+          const label = document.createElement('p'); label.textContent = file.name;
+          main.querySelector('.work-previews').append(label);
         }
       } catch (error) { event.target.value = ''; fail(error); }
     }

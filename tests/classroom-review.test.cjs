@@ -36,3 +36,12 @@ test('music and no-address results can be opened from the ID even without images
   assert.match(submissionReview({ ...item, kind: 'music', url: 'https://suno.com/song/example' }, assignment, 0, 1), /Suno에서 열어 재생/);
   assert.match(submissionReview({ ...item, noUrl: true, url: '', description: '' }, assignment, 0, 1), /주소 없이 제출한 과제/);
 });
+
+test('teacher review offers named file downloads and rejects unsafe attachment links', () => {
+  const attachments = [{name: '보고서.pdf', url: 'https://firebasestorage.googleapis.com/v0/b/yeonsung-ac.firebasestorage.app/o/bootcampClassrooms%2Ftest%2Ffile?alt=media'}, {name: 'bad', url: 'javascript:alert(1)'}];
+  const html = submissionReview({...item, attachments}, assignment, 0, 1);
+  assert.match(html, /download="보고서.pdf"/);
+  assert.match(html, /다운로드 · 열기/);
+  assert.doesNotMatch(html, /javascript:/);
+  assert.match(submissionRows([{...item, attachments}], [assignment]), /첨부파일 2개/);
+});
