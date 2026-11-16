@@ -26,3 +26,16 @@ footer{align-items:flex-start;justify-content:space-between;gap:28px}.footer-bra
 
 /* MAKE 01 external interactive experience. */
 .lesson-experience{display:block;margin-top:28px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;transition:border-color .2s}.lesson-experience:hover{border-color:#b68b40}.lesson-experience>img{display:block;width:100%;height:auto}.lesson-experience-copy{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:20px 22px}.lesson-experience-copy small{font-size:10px;color:#867036;font-weight:700;letter-spacing:.04em}.lesson-experience-copy h2{font-size:19px;margin:8px 0}.lesson-experience-copy p{font-size:12px;line-height:1.8;color:var(--muted);margin:0}.lesson-experience-copy>span{font-size:28px;color:#867036}@media(max-width:600px){.lesson-experience-copy{padding:17px}.lesson-experience-copy h2{font-size:17px}}
+
+/* MAKE curriculum directly below the professor introduction */
+.make-contents{margin:0 0 40px;padding:30px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.make-contents-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px}
+.make-contents h2{margin:10px 0 0;font-size:24px;line-height:1.4}
+.make-contents h2 span{margin-left:10px;font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.make-contents-heading p{margin:0;font-size:12px;line-height:1.7;color:var(--muted)}
+.make-contents-list{display:grid;grid-template-rows:repeat(5,auto);grid-auto-flow:column;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:24px;row-gap:0;list-style:none;margin:0;padding:0}
+.make-contents-list li{min-width:0;border-top:1px solid var(--line)}
+.make-contents-list a{display:flex;gap:12px;align-items:baseline;padding:14px 0;font-size:13px;line-height:1.65;overflow-wrap:anywhere}
+.make-contents-number{flex:0 0 24px;color:#547b18;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.make-contents-list a:hover{color:#547b18}
+@media(max-width:760px){.make-contents{padding:22px 20px}.make-contents-heading{display:block}.make-contents-heading p{margin-top:10px}.make-contents-list{grid-template-columns:minmax(0,1fr);grid-template-rows:none;grid-auto-flow:row}.make-contents-list a{font-size:14px;padding:12px 0}}
