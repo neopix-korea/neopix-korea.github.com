@@ -46,7 +46,7 @@ footer{align-items:flex-start;justify-content:space-between;gap:28px}.footer-bra
 .make-student-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .make-student-card{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .2s,box-shadow .2s}
 .make-student-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px #17212612}
-.make-student-card img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top;background:#edf0e8;border-bottom:1px solid var(--line)}
+.make-student-card img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top;background:#edf0e8;border-bottom:1px solid var(--line)}
 .make-student-card-body{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px}
 .make-student-card h3{font-size:17px;margin:0 0 6px}.make-student-card p{font-size:12px;margin:0;color:var(--muted)}
 .make-student-card-body>span{color:#547b18;font-size:20px}
