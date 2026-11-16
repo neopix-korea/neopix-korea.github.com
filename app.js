@@ -53,8 +53,50 @@ function makeContents() {
   return `<section class="make-contents" aria-labelledby="make-contents-title"><div class="make-contents-heading"><div><div class="eyebrow">MAKE · CURRICULUM</div><h2 id="make-contents-title">강의 목차 <span>전체 15강</span></h2></div><p>제목을 누르면 해당 강의로 이동합니다.</p></div><ol class="make-contents-list">${lessons.map(lesson => `<li><a href="make/${String(lesson.number).padStart(2, '0')}/"><span class="make-contents-number">${String(lesson.number).padStart(2, '0')}</span><span>${lesson.topic.replace(/^제\d+강\s*-\s*/, '')}</span></a></li>`).join('')}</ol></section>`;
 }
 
+const makeStudentWorks = [
+  {
+    "name": "박보근",
+    "url": "https://parkbokeun.github.io/",
+    "title": "PLAY & SOUND",
+    "image": "make/student-thumbnails/parkbokeun.webp"
+  },
+  {
+    "name": "심희현",
+    "url": "https://yeonsungai19-ops.github.io/",
+    "title": "여행과 AI 창작 기록",
+    "image": "make/student-thumbnails/simheeheon.webp"
+  },
+  {
+    "name": "이보현",
+    "url": "https://bohyeon04.github.io/",
+    "title": "BOHYEON LAB",
+    "image": "make/student-thumbnails/leebohyeon.webp"
+  },
+  {
+    "name": "이혜정",
+    "url": "https://heyjung00.github.io/",
+    "title": "미니게임 & 음악",
+    "image": "make/student-thumbnails/leehyejung.webp"
+  },
+  {
+    "name": "정효주",
+    "url": "https://yeonsungai27-art.github.io/",
+    "title": "ZERO° · 작품 모음",
+    "image": "make/student-thumbnails/junghyoju.webp"
+  },
+  {
+    "name": "현예림",
+    "url": "https://yeonsungai29-gif.github.io/game/",
+    "title": "우사기의 작은 여행",
+    "image": "make/student-thumbnails/hyunyerim.webp"
+  }
+];
+function studentGallery() {
+  return `<section class="make-student-gallery" id="student-gallery" aria-labelledby="student-gallery-title"><div class="section-heading"><h2 id="student-gallery-title">MAKE 수강생 작품</h2><p>직접 만든 홈페이지와 창작물을 만나보세요.</p></div><div class="make-student-grid">${makeStudentWorks.map(work => `<a class="make-student-card" href="${work.url}" target="_blank" rel="noopener noreferrer" aria-label="${work.name} · ${work.title} · 새 창에서 열기"><img src="${work.image}" width="960" height="600" alt="${work.name}의 ${work.title} 홈페이지 미리보기" loading="lazy"><div class="make-student-card-body"><div><h3>${work.name}</h3><p>${work.title}</p></div><span aria-hidden="true">↗</span></div></a>`).join('')}</div></section>`;
+}
+
 function renderMake() {
-  app.innerHTML = `${professorIntro()}${makeContents()}<section class="make-survey" aria-labelledby="make-survey-title"><div class="section-heading"><h2 id="make-survey-title">MAKE 기초설문</h2></div><ul class="make-survey-list"><li><a href="https://www.neopixkorea.com/AI/check/list/" target="_blank" rel="noopener noreferrer"><span>MAKE 기초설문</span><span class="make-survey-action">설문 바로가기 ↗</span></a></li></ul></section>${classroomQr()}<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section id="classroom-root" aria-label="실습 과제 제출"></section><section aria-labelledby="lessons-title"><details class="lessons-disclosure"><summary><h2 id="lessons-title">강의 목록 <span>전체 15강</span></h2><span class="lessons-toggle"><span class="when-closed">펼치기 ＋</span><span class="when-open">접기 −</span></span></summary><div class="lessons-content"><div class="toolbar"><span id="lesson-count">15 LESSONS</span><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></div></details></section>`;
+  app.innerHTML = `${professorIntro()}${makeContents()}<section class="make-survey" aria-labelledby="make-survey-title"><div class="section-heading"><h2 id="make-survey-title">MAKE 기초설문</h2></div><ul class="make-survey-list"><li><a href="https://www.neopixkorea.com/AI/check/list/" target="_blank" rel="noopener noreferrer"><span>MAKE 기초설문</span><span class="make-survey-action">설문 바로가기 ↗</span></a></li></ul></section>${classroomQr()}<div class="breadcrumb"><a href="./">강의 소개</a><span>/</span>CHAPTER 01 · MAKE</div><section class="course-hero"><div class="eyebrow">CHAPTER 01 · MAKE</div><h1>AI로 직접 만들기</h1><p class="intro">작은 아이디어를 나만의 결과물로.<br>1강부터 15강까지, AI와 함께 만드는 과정을 차근차근 시작하세요.</p><div class="course-meta"><span>전체 15강</span><span>실습 중심 학습</span><span>강의 영상 15개</span></div><div class="big-word" aria-hidden="true">MAKE</div></section><section id="classroom-root" aria-label="실습 과제 제출"></section><section aria-labelledby="lessons-title"><details class="lessons-disclosure"><summary><h2 id="lessons-title">강의 목록 <span>전체 15강</span></h2><span class="lessons-toggle"><span class="when-closed">펼치기 ＋</span><span class="when-open">접기 −</span></span></summary><div class="lessons-content"><div class="toolbar"><span id="lesson-count">15 LESSONS</span><input class="search" type="search" placeholder="강의 검색 · 예: 1강" aria-label="MAKE 강의 검색"></div><div class="lesson-list" id="lesson-list"></div></div></details></section>${studentGallery()}`;
   bindClassroomQr();
   renderLessons('');
   app.querySelector('.search').addEventListener('input', event => renderLessons(event.target.value));
